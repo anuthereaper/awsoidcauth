@@ -1,0 +1,29 @@
+name: List AWS S3 Bucket Objects
+
+# Trigger the workflow manually
+on:
+  workflow_dispatch:
+
+# Necessary permissions for workflow
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  S3BucketIntegration:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+		uses: actions/checkout@v4.1.1
+           
+      # Assume the OIDC Role to get temporary credentials 
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: us-east-1
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/GitHub_Actions_Role
+  
+      # List all buckets
+      - name: List S3 Bucket
+        run: |
+          echo "==> Listing all S3 buckets"
+          aws s3 ls
