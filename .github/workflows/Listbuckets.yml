@@ -4,22 +4,21 @@ name: List AWS S3 Bucket Objects
 on:
   workflow_dispatch:
 
-# Necessary permissions for workflow
-permissions:
-  id-token: write
-  contents: read
-
 jobs:
   S3BucketIntegration:
+    name: Deploy Site
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
     steps:
       - name: Checkout
-		uses: actions/checkout@v4.1.1
-           
-      # Assume the OIDC Role to get temporary credentials 
-      - uses: aws-actions/configure-aws-credentials@v4
+        uses: actions/checkout@v4.1.1
+ 
+      - name: Configure AWS credentials from Test account
+        uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-region: us-east-1
+          aws-region: ap-south-1
           role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/GitHub_Actions_Role
   
       # List all buckets
@@ -27,3 +26,7 @@ jobs:
         run: |
           echo "==> Listing all S3 buckets"
           aws s3 ls
+
+      - name: Upload the site contents
+        run: |
+          aws s3 cp Readme.md s3://anus3demo1/
